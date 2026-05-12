@@ -2,6 +2,10 @@
 
 use App\Http\Controllers\AuthController;
 use App\Http\Controllers\UserController;
+use App\Http\Controllers\CategoryController;
+use App\Http\Controllers\SupplierController;
+use App\Http\Controllers\UnitController;
+use App\Http\Controllers\StorageLocationController;
 use Illuminate\Support\Facades\Route;
 
 // Public
@@ -15,5 +19,13 @@ Route::middleware('auth:sanctum')->group(function () {
     // Kelola user — hanya admin
     Route::middleware('role:admin')->group(function () {
         Route::apiResource('users', UserController::class);
+    });
+
+    // Data master — hanya admin
+    Route::middleware('role:admin')->group(function () {
+        Route::apiResource('categories',       CategoryController::class);
+        Route::apiResource('suppliers',        SupplierController::class);
+        Route::apiResource('units',            UnitController::class);
+        Route::apiResource('storage-locations', StorageLocationController::class);
     });
 });
