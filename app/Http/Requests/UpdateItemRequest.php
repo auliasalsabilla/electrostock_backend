@@ -32,7 +32,6 @@ class UpdateItemRequest extends FormRequest
             'stock_minimum'       => ['sometimes', 'integer', 'min:0'],
             'stock_maximum'       => ['nullable', 'integer', 'min:0'],
             'purchase_price'      => ['sometimes', 'numeric', 'min:0'],
-            'selling_price'       => ['sometimes', 'numeric', 'min:0'],
             'is_active'           => ['sometimes', 'boolean'],
         ];
     }

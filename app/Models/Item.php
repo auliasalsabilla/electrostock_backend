@@ -23,7 +23,6 @@ class Item extends Model
         'stock_minimum',
         'stock_maximum',
         'purchase_price',
-        'selling_price',
         'is_active',
         'created_by',
     ];
@@ -34,7 +33,6 @@ class Item extends Model
         'stock_minimum'  => 'integer',
         'stock_maximum'  => 'integer',
         'purchase_price' => 'decimal:2',
-        'selling_price'  => 'decimal:2',
     ];
 
     public function category()
