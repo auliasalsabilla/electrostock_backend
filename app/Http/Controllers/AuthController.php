@@ -32,7 +32,6 @@ class AuthController extends Controller
             ], 403);
         }
 
-        // Hapus token lama
         $user->tokens()->delete();
 
         $token = $user->createToken('auth_token')->plainTextToken;
@@ -63,6 +62,58 @@ class AuthController extends Controller
         return response()->json([
             'status'  => true,
             'message' => 'Logout berhasil.',
+        ]);
+    }
+
+    public function updateProfile(Request $request): JsonResponse
+    {
+        $user = $request->user();
+
+        $request->validate([
+            'name'  => ['sometimes', 'string', 'max:100'],
+            'email' => ['sometimes', 'email', 'unique:users,email,' . $user->id],
+            'phone' => ['nullable', 'string', 'max:20'],
+        ], [
+            'email.unique' => 'Email sudah digunakan.',
+        ]);
+
+        $user->update($request->only('name', 'email', 'phone'));
+
+        return response()->json([
+            'status'  => true,
+            'message' => 'Profil berhasil diupdate.',
+            'data'    => $user,
+        ]);
+    }
+
+    public function updatePassword(Request $request): JsonResponse
+    {
+        $request->validate([
+            'current_password' => ['required', 'string'],
+            'new_password'     => ['required', 'string', 'min:8', 'confirmed'],
+        ], [
+            'current_password.required' => 'Password lama wajib diisi.',
+            'new_password.required'     => 'Password baru wajib diisi.',
+            'new_password.min'          => 'Password baru minimal 8 karakter.',
+            'new_password.confirmed'    => 'Konfirmasi password tidak cocok.',
+        ]);
+
+        $user = $request->user();
+
+        if (! Hash::check($request->current_password, $user->password)) {
+            return response()->json([
+                'status'  => false,
+                'message' => 'Password lama tidak sesuai.',
+            ], 422);
+        }
+
+        $user->update([
+            'password' => Hash::make($request->new_password),
+        ]);
+
+        return response()->json([
+            'status'  => true,
+            'message' => 'Password berhasil diubah.',
         ]);
     }
 }

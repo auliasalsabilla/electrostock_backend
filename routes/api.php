@@ -17,6 +17,10 @@ Route::middleware('auth:sanctum')->group(function () {
     Route::get('/me',      [AuthController::class, 'me']);
     Route::post('/logout', [AuthController::class, 'logout']);
 
+    // Edit profile — semua role
+    Route::put('/profile',          [AuthController::class, 'updateProfile']);
+    Route::put('/profile/password', [AuthController::class, 'updatePassword']);
+
     // Kelola user — hanya admin
     Route::middleware('role:admin')->group(function () {
         Route::apiResource('users', UserController::class);
