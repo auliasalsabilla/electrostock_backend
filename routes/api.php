@@ -6,6 +6,7 @@ use App\Http\Controllers\CategoryController;
 use App\Http\Controllers\SupplierController;
 use App\Http\Controllers\UnitController;
 use App\Http\Controllers\StorageLocationController;
+use App\Http\Controllers\ItemController;
 use Illuminate\Support\Facades\Route;
 
 // Public
@@ -23,9 +24,10 @@ Route::middleware('auth:sanctum')->group(function () {
 
     // Data master — hanya admin
     Route::middleware('role:admin')->group(function () {
-        Route::apiResource('categories',       CategoryController::class);
-        Route::apiResource('suppliers',        SupplierController::class);
-        Route::apiResource('units',            UnitController::class);
+        Route::apiResource('categories',        CategoryController::class);
+        Route::apiResource('suppliers',         SupplierController::class);
+        Route::apiResource('units',             UnitController::class);
         Route::apiResource('storage-locations', StorageLocationController::class);
+        Route::apiResource('items',             ItemController::class);
     });
 });
