@@ -30,7 +30,8 @@ class StoreItemRequest extends FormRequest
             'stock_minimum'       => ['sometimes', 'integer', 'min:0'],
             'stock_maximum'       => ['nullable', 'integer', 'min:0'],
             'purchase_price'      => ['sometimes', 'numeric', 'min:0'],
-            'is_active'           => ['sometimes', 'boolean'],
+            'is_active'           => ['sometimes'],
+            'image'               => ['nullable', 'image', 'mimes:jpg,jpeg,png,webp', 'max:2048'],
         ];
     }
 
@@ -44,6 +45,9 @@ class StoreItemRequest extends FormRequest
             'supplier_id.exists'         => 'Supplier tidak valid.',
             'unit_id.exists'             => 'Satuan tidak valid.',
             'storage_location_id.exists' => 'Lokasi penyimpanan tidak valid.',
+            'image.image'                => 'File harus berupa gambar.',
+            'image.mimes'                => 'Format gambar harus jpg, jpeg, png, atau webp.',
+            'image.max'                  => 'Ukuran gambar maksimal 2MB.',
         ];
     }
 }
