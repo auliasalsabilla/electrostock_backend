@@ -7,12 +7,15 @@ use App\Http\Requests\StoreCategoryRequest;
 use App\Http\Requests\UpdateCategoryRequest;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Support\Str;
+use Illuminate\Support\Facades\Cache;
 
 class CategoryController extends Controller
 {
     public function index(): JsonResponse
     {
-        $categories = Category::orderBy('name')->get();
+        $categories = Cache::remember('categories', 300, function () {
+            return Category::orderBy('name')->get();
+        });
 
         return response()->json([
             'status' => true,
@@ -36,6 +39,8 @@ class CategoryController extends Controller
 
         $category = Category::create($data);
 
+        Cache::forget('categories'); // clear cache setelah tambah
+
         return response()->json([
             'status'  => true,
             'message' => 'Kategori berhasil ditambahkan.',
@@ -52,6 +57,8 @@ class CategoryController extends Controller
 
         $category->update($data);
 
+        Cache::forget('categories'); // clear cache setelah update
+
         return response()->json([
             'status'  => true,
             'message' => 'Kategori berhasil diupdate.',
@@ -62,6 +69,8 @@ class CategoryController extends Controller
     public function destroy(Category $category): JsonResponse
     {
         $category->delete();
+
+        Cache::forget('categories'); // clear cache setelah hapus
 
         return response()->json([
             'status'  => true,

@@ -6,12 +6,15 @@ use App\Models\StorageLocation;
 use App\Http\Requests\StoreStorageLocationRequest;
 use App\Http\Requests\UpdateStorageLocationRequest;
 use Illuminate\Http\JsonResponse;
+use Illuminate\Support\Facades\Cache;
 
 class StorageLocationController extends Controller
 {
     public function index(): JsonResponse
     {
-        $locations = StorageLocation::orderBy('name')->get();
+        $locations = Cache::remember('storage_locations', 300, function () {
+            return StorageLocation::orderBy('name')->get();
+        });
 
         return response()->json([
             'status' => true,
@@ -31,6 +34,8 @@ class StorageLocationController extends Controller
     {
         $location = StorageLocation::create($request->validated());
 
+        Cache::forget('storage_locations'); // clear cache setelah tambah
+
         return response()->json([
             'status'  => true,
             'message' => 'Lokasi penyimpanan berhasil ditambahkan.',
@@ -42,6 +47,8 @@ class StorageLocationController extends Controller
     {
         $storageLocation->update($request->validated());
 
+        Cache::forget('storage_locations'); // clear cache setelah update
+
         return response()->json([
             'status'  => true,
             'message' => 'Lokasi penyimpanan berhasil diupdate.',
@@ -52,6 +59,8 @@ class StorageLocationController extends Controller
     public function destroy(StorageLocation $storageLocation): JsonResponse
     {
         $storageLocation->delete();
+
+        Cache::forget('storage_locations'); // clear cache setelah hapus
 
         return response()->json([
             'status'  => true,

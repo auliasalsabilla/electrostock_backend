@@ -6,12 +6,15 @@ use App\Models\Unit;
 use App\Http\Requests\StoreUnitRequest;
 use App\Http\Requests\UpdateUnitRequest;
 use Illuminate\Http\JsonResponse;
+use Illuminate\Support\Facades\Cache;
 
 class UnitController extends Controller
 {
     public function index(): JsonResponse
     {
-        $units = Unit::orderBy('name')->get();
+        $units = Cache::remember('units', 300, function () {
+            return Unit::orderBy('name')->get();
+        });
 
         return response()->json([
             'status' => true,
@@ -31,6 +34,8 @@ class UnitController extends Controller
     {
         $unit = Unit::create($request->validated());
 
+        Cache::forget('units'); // clear cache setelah tambah
+
         return response()->json([
             'status'  => true,
             'message' => 'Satuan berhasil ditambahkan.',
@@ -42,6 +47,8 @@ class UnitController extends Controller
     {
         $unit->update($request->validated());
 
+        Cache::forget('units'); // clear cache setelah update
+
         return response()->json([
             'status'  => true,
             'message' => 'Satuan berhasil diupdate.',
@@ -52,6 +59,8 @@ class UnitController extends Controller
     public function destroy(Unit $unit): JsonResponse
     {
         $unit->delete();
+
+        Cache::forget('units'); // clear cache setelah hapus
 
         return response()->json([
             'status'  => true,

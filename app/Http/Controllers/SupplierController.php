@@ -6,12 +6,15 @@ use App\Models\Supplier;
 use App\Http\Requests\StoreSupplierRequest;
 use App\Http\Requests\UpdateSupplierRequest;
 use Illuminate\Http\JsonResponse;
+use Illuminate\Support\Facades\Cache;
 
 class SupplierController extends Controller
 {
     public function index(): JsonResponse
     {
-        $suppliers = Supplier::orderBy('name')->get();
+        $suppliers = Cache::remember('suppliers', 300, function () {
+            return Supplier::orderBy('name')->get();
+        });
 
         return response()->json([
             'status' => true,
@@ -34,6 +37,8 @@ class SupplierController extends Controller
 
         $supplier = Supplier::create($data);
 
+        Cache::forget('suppliers'); // clear cache setelah tambah
+
         return response()->json([
             'status'  => true,
             'message' => 'Supplier berhasil ditambahkan.',
@@ -45,6 +50,8 @@ class SupplierController extends Controller
     {
         $supplier->update($request->validated());
 
+        Cache::forget('suppliers'); // clear cache setelah update
+
         return response()->json([
             'status'  => true,
             'message' => 'Supplier berhasil diupdate.',
@@ -55,6 +62,8 @@ class SupplierController extends Controller
     public function destroy(Supplier $supplier): JsonResponse
     {
         $supplier->delete();
+
+        Cache::forget('suppliers'); // clear cache setelah hapus
 
         return response()->json([
             'status'  => true,

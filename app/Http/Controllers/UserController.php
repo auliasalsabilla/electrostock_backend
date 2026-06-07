@@ -6,13 +6,15 @@ use App\Models\User;
 use App\Http\Requests\StoreUserRequest;
 use App\Http\Requests\UpdateUserRequest;
 use Illuminate\Http\JsonResponse;
+use Illuminate\Support\Facades\Hash;
 
 class UserController extends Controller
 {
-    // GET /api/users - ambil semua user
     public function index(): JsonResponse
     {
-        $users = User::orderBy('created_at', 'desc')->get();
+        $users = User::select(['id', 'name', 'email', 'role', 'is_active', 'created_at'])
+            ->orderBy('created_at', 'desc')
+            ->get();
 
         return response()->json([
             'status' => true,
@@ -20,7 +22,6 @@ class UserController extends Controller
         ]);
     }
 
-    // GET /api/users/{id} - ambil satu user
     public function show(User $user): JsonResponse
     {
         return response()->json([
@@ -29,10 +30,12 @@ class UserController extends Controller
         ]);
     }
 
-    // POST /api/users - tambah user baru
     public function store(StoreUserRequest $request): JsonResponse
     {
-        $user = User::create($request->validated());
+        $data             = $request->validated();
+        $data['password'] = Hash::make($data['password']);
+
+        $user = User::create($data);
 
         return response()->json([
             'status'  => true,
@@ -41,10 +44,17 @@ class UserController extends Controller
         ], 201);
     }
 
-    // PUT /api/users/{id} - update user
     public function update(UpdateUserRequest $request, User $user): JsonResponse
     {
-        $user->update($request->validated());
+        $data = $request->validated();
+
+        if (!empty($data['password'])) {
+            $data['password'] = Hash::make($data['password']);
+        } else {
+            unset($data['password']);
+        }
+
+        $user->update($data);
 
         return response()->json([
             'status'  => true,
@@ -53,7 +63,6 @@ class UserController extends Controller
         ]);
     }
 
-    // DELETE /api/users/{id} - hapus user
     public function destroy(User $user): JsonResponse
     {
         if ($user->id === auth()->id()) {
