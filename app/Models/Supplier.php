@@ -17,6 +17,8 @@ class Supplier extends Model
         'email',
         'address',
         'city',
+        'bank_name',
+        'bank_account',
         'notes',
         'is_active',
         'created_by',

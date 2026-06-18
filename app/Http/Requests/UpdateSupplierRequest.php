@@ -2,7 +2,6 @@
 
 namespace App\Http\Requests;
 
-use Illuminate\Contracts\Validation\ValidationRule;
 use Illuminate\Foundation\Http\FormRequest;
 
 class UpdateSupplierRequest extends FormRequest
@@ -12,12 +11,9 @@ class UpdateSupplierRequest extends FormRequest
         return true;
     }
 
-    /**
-     * @return array<string, ValidationRule|array<mixed>|string>
-     */
     public function rules(): array
     {
-        $supplierId = $this->route('supplier');
+        $supplierId = $this->route('supplier')?->id ?? $this->route('supplier');
 
         return [
             'code'           => ['sometimes', 'string', 'max:20', "unique:suppliers,code,{$supplierId}"],
@@ -27,16 +23,10 @@ class UpdateSupplierRequest extends FormRequest
             'email'          => ['nullable', 'email', 'max:150'],
             'address'        => ['nullable', 'string'],
             'city'           => ['nullable', 'string', 'max:100'],
+            'bank_name'      => ['nullable', 'string', 'max:100'],
+            'bank_account'   => ['nullable', 'string', 'max:50'],
             'notes'          => ['nullable', 'string'],
             'is_active'      => ['sometimes', 'boolean'],
-        ];
-    }
-
-    public function messages(): array
-    {
-        return [
-            'code.unique'  => 'Kode supplier sudah digunakan.',
-            'email.email'  => 'Format email tidak valid.',
         ];
     }
 }

@@ -2,21 +2,28 @@
 
 namespace Database\Seeders;
 
+use App\Models\Unit;
 use Illuminate\Database\Seeder;
-use Illuminate\Support\Facades\DB;
 
 class UnitSeeder extends Seeder
 {
     public function run(): void
     {
         $units = [
-            ['name' => 'Unit',  'abbreviation' => 'pcs'],
-            ['name' => 'Box',   'abbreviation' => 'box'],
-            ['name' => 'Lusin', 'abbreviation' => 'lsn'],
-            ['name' => 'Meter', 'abbreviation' => 'm'],
-            ['name' => 'Kg',    'abbreviation' => 'kg'],
+            ['name' => 'Pcs',    'abbreviation' => 'pcs'],
+            ['name' => 'Set',    'abbreviation' => 'set'],
+            ['name' => 'Kg',     'abbreviation' => 'kg'],
+            ['name' => 'Batang', 'abbreviation' => 'btg'],
+            ['name' => 'Meter',  'abbreviation' => 'm'],
+            ['name' => 'Box',    'abbreviation' => 'box'],
+            ['name' => 'Roll',   'abbreviation' => 'roll'],
         ];
 
-        DB::table('units')->insertOrIgnore($units);
+        foreach ($units as $unit) {
+            Unit::firstOrCreate(
+                ['name' => $unit['name']],
+                ['abbreviation' => $unit['abbreviation']]
+            );
+        }
     }
 }

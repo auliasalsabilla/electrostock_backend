@@ -36,8 +36,7 @@ class SupplierController extends Controller
         $data['created_by'] = auth()->id();
 
         $supplier = Supplier::create($data);
-
-        Cache::forget('suppliers'); // clear cache setelah tambah
+        Cache::forget('suppliers');
 
         return response()->json([
             'status'  => true,
@@ -49,8 +48,7 @@ class SupplierController extends Controller
     public function update(UpdateSupplierRequest $request, Supplier $supplier): JsonResponse
     {
         $supplier->update($request->validated());
-
-        Cache::forget('suppliers'); // clear cache setelah update
+        Cache::forget('suppliers');
 
         return response()->json([
             'status'  => true,
@@ -62,8 +60,7 @@ class SupplierController extends Controller
     public function destroy(Supplier $supplier): JsonResponse
     {
         $supplier->delete();
-
-        Cache::forget('suppliers'); // clear cache setelah hapus
+        Cache::forget('suppliers');
 
         return response()->json([
             'status'  => true,

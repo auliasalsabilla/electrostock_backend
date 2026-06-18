@@ -17,6 +17,7 @@ class StoreTransactionRequest extends FormRequest
             'type'             => ['required', 'in:in,out'],
             'item_id'          => ['required', 'exists:items,id'],
             'quantity'         => ['required', 'integer', 'min:1'],
+            'unit'             => ['nullable', 'string', 'max:50'],
             'price'            => ['nullable', 'numeric'],
             'note'             => ['nullable', 'string'],
             'transaction_date' => ['required', 'date'],

@@ -16,7 +16,8 @@ class TransactionController extends Controller
     {
         $transactions = Cache::remember('transactions', 120, function () {
             return Transaction::with([
-                    'item:id,name,code',
+                    'item:id,name,code,unit_id',
+                    'item.unit:id,name,abbreviation',
                     'user:id,name'
                 ])
                 ->select([
