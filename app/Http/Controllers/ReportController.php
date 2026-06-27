@@ -110,9 +110,11 @@ class ReportController extends Controller
 
     public function summary(): JsonResponse
     {
-        $today = now()->toDateString();
+        $today     = now()->toDateString();
+        $weekStart = now()->startOfWeek()->toDateString();
+        $weekEnd   = now()->endOfWeek()->toDateString();
 
-        $summary = Cache::remember('report_summary_' . $today, 60, function () use ($today) {
+        $summary = Cache::remember('report_summary_' . $today, 60, function () use ($today, $weekStart, $weekEnd) {
 
             // Semua query summary dalam 1 kali ambil data
             $totalItems = Item::where('is_active', true)->count();
@@ -120,6 +122,13 @@ class ReportController extends Controller
             $transaksiHariIni = Transaction::whereDate('transaction_date', $today)->count();
 
             $masukKeluar = Transaction::whereDate('transaction_date', $today)
+                ->selectRaw("
+                    SUM(CASE WHEN type = 'in'  THEN quantity ELSE 0 END) as masuk,
+                    SUM(CASE WHEN type = 'out' THEN quantity ELSE 0 END) as keluar
+                ")
+                ->first();
+
+            $masukKeluarMinggu = Transaction::whereBetween('transaction_date', [$weekStart, $weekEnd])
                 ->selectRaw("
                     SUM(CASE WHEN type = 'in'  THEN quantity ELSE 0 END) as masuk,
                     SUM(CASE WHEN type = 'out' THEN quantity ELSE 0 END) as keluar
@@ -147,6 +156,8 @@ class ReportController extends Controller
                 'transaksi_hari_ini' => $transaksiHariIni,
                 'masuk_hari_ini'     => (int) ($masukKeluar->masuk  ?? 0),
                 'keluar_hari_ini'    => (int) ($masukKeluar->keluar ?? 0),
+                'masuk_minggu_ini'   => (int) ($masukKeluarMinggu->masuk  ?? 0),
+                'keluar_minggu_ini'  => (int) ($masukKeluarMinggu->keluar ?? 0),
                 'low_stock'          => $lowStock,
             ];
         });

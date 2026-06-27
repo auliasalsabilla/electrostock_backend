@@ -52,11 +52,13 @@ Route::middleware('auth:sanctum')->group(function () {
         Route::patch('notifications/read-all',               [NotificationController::class, 'markAllAsRead']);
     });
 
+    // Summary - semua role bisa akses (untuk dashboard)
+    Route::get('reports/summary', [ReportController::class, 'summary']);
+
     // Laporan - admin & manager
     Route::middleware('role:admin,manager')->group(function () {
         Route::get('reports/stock',        [ReportController::class, 'stock']);
         Route::get('reports/transactions', [ReportController::class, 'transactions']);
-        Route::get('reports/summary',      [ReportController::class, 'summary']);
         Route::get('reports/export',       [ReportController::class, 'export']);
     });
 

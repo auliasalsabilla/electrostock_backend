@@ -157,22 +157,33 @@ class BackupController extends Controller
                     $unit     = Unit::where('name', $row[5])->first();
                     $location = StorageLocation::where('name', $row[6])->first();
 
-                    Item::updateOrCreate(
-                        ['id' => $row[0]],
-                        [
-                            'code'                => $row[1] ?? '',
-                            'name'                => $row[2] ?? '',
-                            'category_id'         => $category?->id,
-                            'supplier_id'         => $supplier?->id,
-                            'unit_id'             => $unit?->id,
-                            'storage_location_id' => $location?->id,
-                            'stock'               => $row[7] ?? 0,
-                            'stock_minimum'       => $row[8] ?? 0,
-                            'stock_maximum'       => $row[9] !== '-' ? $row[9] : null,
-                            'purchase_price'      => $row[10] ?? 0,
-                            'is_active'           => ($row[11] ?? 'Aktif') === 'Aktif',
-                        ]
-                    );
+                    // withTrashed() supaya baris yang sudah di-soft-delete tetap
+                    // ditemukan dan dipulihkan (bukan dibuatkan baris baru dengan
+                    // kode yang sama, yang akan bentrok dengan baris lama).
+                    $item = Item::withTrashed()->find($row[0]);
+
+                    $itemData = [
+                        'code'                => $row[1] ?? '',
+                        'name'                => $row[2] ?? '',
+                        'category_id'         => $category?->id,
+                        'supplier_id'         => $supplier?->id,
+                        'unit_id'             => $unit?->id,
+                        'storage_location_id' => $location?->id,
+                        'stock'               => $row[7] ?? 0,
+                        'stock_minimum'       => $row[8] ?? 0,
+                        'stock_maximum'       => $row[9] !== '-' ? $row[9] : null,
+                        'purchase_price'      => $row[10] ?? 0,
+                        'is_active'           => ($row[11] ?? 'Aktif') === 'Aktif',
+                    ];
+
+                    if ($item) {
+                        $item->update($itemData);
+                        if ($item->trashed()) {
+                            $item->restore();
+                        }
+                    } else {
+                        Item::create(array_merge(['id' => $row[0]], $itemData));
+                    }
                 }
                 $restored[] = 'Data Barang';
             }
