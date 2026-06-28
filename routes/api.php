@@ -40,9 +40,16 @@ Route::middleware('auth:sanctum')->group(function () {
     Route::put('/profile',          [AuthController::class, 'updateProfile']);
     Route::put('/profile/password', [AuthController::class, 'updatePassword']);
 
-    // Transaksi - admin & staff
+    // Transaksi - baca: admin, staff, manager | tulis: admin, staff
+    Route::middleware('role:admin,staff,manager')->group(function () {
+        Route::get('transactions',               [TransactionController::class, 'index']);
+        Route::get('transactions/{transaction}', [TransactionController::class, 'show']);
+    });
+
     Route::middleware('role:admin,staff')->group(function () {
-        Route::apiResource('transactions', TransactionController::class);
+        Route::post('transactions',                 [TransactionController::class, 'store']);
+        Route::put('transactions/{transaction}',    [TransactionController::class, 'update']);
+        Route::delete('transactions/{transaction}', [TransactionController::class, 'destroy']);
     });
 
     // Notifikasi - admin & staff
